@@ -1,0 +1,23 @@
+{
+  "name": "forest-royal-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/janhon3n/forest-royal-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/janhon3n/forest-royal-server/issues"
+  },
+  "homepage": "https://github.com/janhon3n/forest-royal-server#readme",
+  "dependencies": {
+    "geolib": "^2.0.24",
+    "socket.io": "^2.1.1"
+  }
+}
