@@ -1,29 +1,47 @@
-const io = require('socket.io')();
+const io = require('socket.io')()
+const Game = require('./Game')
 
-let createCode = () => {
-    return parseInt(Math.random() * 900000 + 10000)
+const games = {}
+
+const createCode = () => {
+  let code = parseInt(Math.random() * 900000 + 10000)
+  while (Object.keys(games).indexOf(code) !== -1) {
+    code = parseInt(Math.random() * 900000 + 10000)
+  }
+  return code
 }
 
+io.on('connection', (player) => {
+  player.tag = player.id
+  console.log('New player ' + player.tag)
 
-io.on('connection', (client) => {
-    console.log("New client " + client.id)
+  player.getRoom = () => {
+    return player.rooms[Object.keys(player.rooms)[0]]
+  }
 
-    client.on('create_game', (options) => {
-        client.join(createCode())
-        let room = client.rooms[0]
-        room.game = new Game(options)
-    })
+  player.on('create_game', (options, callback) => {
+    let code = createCode()
+    games[code] = new Game(options)
+    callback(code)
+  })
 
-    client.on('join_game', (code) => {
-        console.log(io.sockets.adapter.rooms)
-    })
+  player.on('join_game', (code, cb) => {
+    // leave other game
+    if (player.game) player.game.playerLeft(player)
 
-    client.on('disconnect', () => {
-        console.log("Client " + client.id + " has disconnected")
-    })
+    if (!games[code].hasStarted) {
+      games[code].playerJoined(player)
+      cb()
+    }
+  })
+
+  player.on('disconnect', () => {
+    console.log('Player ' + player.tag + ' has disconnected')
+    if (player.game) player.game.playerLeft(player)
+  })
 })
 console.log(io.sockets.adapter.rooms)
 
 let port = 3001
 io.listen(port)
-console.log("Forest Royal server running on port " + port)
+console.log('Forest Royal server running on port ' + port)
